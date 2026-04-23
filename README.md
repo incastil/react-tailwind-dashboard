@@ -1,5 +1,7 @@
 # Workhint UI — React + Tailwind Dashboard
 
+**Live Demo:** [react-tailwind-dashboard-eight.vercel.app](https://react-tailwind-dashboard-eight.vercel.app)
+
 A fully interactive hiring dashboard built with React, Tailwind CSS, and live API integrations for real-time candidate and job data. No UI component library — every element is hand-crafted with Tailwind utility classes.
 
 ## Key Features
