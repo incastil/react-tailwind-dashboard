@@ -322,7 +322,7 @@ function Sidebar({ isOpen, onClose, activePage, onNavigate }) {
   );
 }
 
-function DashboardPage({ query, setQuery, candidates, loading, error }) {
+function DashboardPage({ query, setQuery, candidates, loading, error, dark }) {
   const filteredCandidates = useMemo(() => {
     const term = query.trim().toLowerCase();
     if (!term) return candidates;
@@ -402,28 +402,44 @@ function DashboardPage({ query, setQuery, candidates, loading, error }) {
         </div>
 
         <aside className="space-y-6">
-          <div className="card p-5">
-            <h3 className="text-lg font-semibold dark:text-white">Today's priorities</h3>
-            <ul className="mt-4 space-y-3">
-              {tasks.map((task, index) => (
-                <li key={task} className="flex items-start gap-3 rounded-xl bg-slate-50 p-3 dark:bg-slate-800/60">
-                  <span className="mt-0.5 flex h-6 w-6 items-center justify-center rounded-full bg-brand-100 text-xs font-bold text-brand-700 dark:bg-brand-900/40 dark:text-brand-400">
-                    {index + 1}
-                  </span>
-                  <p className="text-sm text-slate-700 dark:text-slate-400">{task}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <ChartCard title="Hiring trend" description="Active jobs & new candidates over 6 months">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={hiringTrend} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="jobsGradD" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#6366f1" stopOpacity={0.25} />
+                    <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                  </linearGradient>
+                  <linearGradient id="candidatesGradD" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.2} />
+                    <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke={dark ? '#334155' : '#e2e8f0'} />
+                <XAxis dataKey="month" tick={{ fontSize: 11, fill: dark ? '#94a3b8' : '#64748b' }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: dark ? '#94a3b8' : '#64748b' }} axisLine={false} tickLine={false} />
+                <Tooltip content={<ChartTooltip />} />
+                <Legend wrapperStyle={{ fontSize: 11, paddingTop: 8 }} />
+                <Area type="monotone" dataKey="jobs" name="Active jobs" stroke="#6366f1" strokeWidth={2} fill="url(#jobsGradD)" dot={false} />
+                <Area type="monotone" dataKey="candidates" name="Candidates" stroke="#10b981" strokeWidth={2} fill="url(#candidatesGradD)" dot={false} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </ChartCard>
 
-          <div className="card p-5">
-            <h3 className="text-lg font-semibold dark:text-white">What makes it resume-ready</h3>
-            <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-400">
-              This project demonstrates responsive design, reusable component architecture, React state
-              management, live API integration, client-side routing, form validation, data visualization
-              with Recharts, and dark mode — all without a UI framework.
-            </p>
-          </div>
+          <ChartCard title="Candidate pipeline" description="Status breakdown over 6 months">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={pipelineData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }} barSize={8}>
+                <CartesianGrid strokeDasharray="3 3" stroke={dark ? '#334155' : '#e2e8f0'} />
+                <XAxis dataKey="month" tick={{ fontSize: 11, fill: dark ? '#94a3b8' : '#64748b' }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: dark ? '#94a3b8' : '#64748b' }} axisLine={false} tickLine={false} />
+                <Tooltip content={<ChartTooltip />} />
+                <Legend wrapperStyle={{ fontSize: 11, paddingTop: 8 }} />
+                <Bar dataKey="Active" name="Active" fill="#6366f1" radius={[3, 3, 0, 0]} />
+                <Bar dataKey="Interviewing" name="Interviewing" fill="#f59e0b" radius={[3, 3, 0, 0]} />
+                <Bar dataKey="Pending" name="Pending" fill="#94a3b8" radius={[3, 3, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartCard>
         </aside>
       </section>
     </>
@@ -742,7 +758,7 @@ export default function App() {
   function renderPage() {
     switch (activePage) {
       case 'Dashboard':
-        return <DashboardPage query={query} setQuery={setQuery} candidates={candidates} loading={loading} error={error} />;
+        return <DashboardPage query={query} setQuery={setQuery} candidates={candidates} loading={loading} error={error} dark={dark} />;
       case 'Candidates':
         return <CandidatesPage candidates={candidates} loading={loading} error={error} />;
       case 'Jobs':

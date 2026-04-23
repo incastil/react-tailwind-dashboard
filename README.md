@@ -1,28 +1,36 @@
 # Workhint UI — React + Tailwind Dashboard
 
-A responsive candidate tracking dashboard built with React, Vite, and Tailwind CSS. Fetches live data from a public API and includes dark mode, client-side navigation, a mobile sidebar drawer, and a full reports page with charts.
+A fully interactive hiring dashboard built from scratch with React 18, Vite, and Tailwind CSS. No UI component library — every element is hand-crafted with Tailwind utility classes.
 
-## Features
+## What's built
 
-- **Client-side navigation** — Dashboard, Candidates, Jobs, Reports, and Settings pages with active state highlighting
-- **Live candidate data** — fetched from [randomuser.me](https://randomuser.me) with avatar thumbnails
-- **Live job listings** — fetched from [The Muse API](https://www.themuse.com/developers/api/v2) with company, location, level badges, and links to apply
-- **Search filtering** — filter by name, role, or location in real time
-- **Reports page** — 4 charts built with Recharts: hiring trend (area), candidate pipeline (bar), response rate (line), and time to hire (line)
-- **Dark mode** — class-based toggle, persists across all surfaces and charts
-- **Mobile sidebar drawer** — slides in with backdrop on small screens, always visible on desktop
-- **Status badges** — Active, Interviewing, and Pending with light and dark variants
-- **Loading skeleton** — animated placeholders while data loads
-- **Responsive layout** — works on mobile, tablet, and desktop
+### Pages
+- **Dashboard** — stat cards, live candidate table with search filtering, hiring trend area chart, and candidate pipeline bar chart
+- **Candidates** — full candidate list with dedicated search input and status badges
+- **Jobs** — live job listings fetched from The Muse API, filterable by level and keyword, with links to apply
+- **Reports** — 4 Recharts data visualizations: hiring trend (area), candidate pipeline (bar), response rate (line), time to hire (line)
+- **Settings** — placeholder, ready to extend
+
+### Features
+- Live candidate data from [randomuser.me](https://randomuser.me) with avatar thumbnails
+- Live job listings from [The Muse API](https://www.themuse.com/developers/api/v2) — no API key required
+- Add candidate modal with form validation and initials avatar fallback
+- Dark mode — class-based toggle that persists across every surface and chart
+- Mobile sidebar drawer — slides in with backdrop and close button, always visible on desktop
+- Animated loading skeletons while API data loads
+- Client-side navigation with active page highlighting
+- Responsive layout across mobile, tablet, and desktop
 
 ## Tech stack
 
-- [React 18](https://react.dev)
-- [Vite](https://vitejs.dev)
-- [Tailwind CSS v3](https://tailwindcss.com)
-- [Recharts](https://recharts.org)
-- [randomuser.me API](https://randomuser.me)
-- [The Muse API](https://www.themuse.com/developers/api/v2)
+| Tool | Purpose |
+|------|---------|
+| [React 18](https://react.dev) | UI and state management |
+| [Vite](https://vitejs.dev) | Build tool and dev server |
+| [Tailwind CSS v3](https://tailwindcss.com) | Styling |
+| [Recharts](https://recharts.org) | Data visualization |
+| [randomuser.me](https://randomuser.me) | Mock candidate data |
+| [The Muse API](https://www.themuse.com/developers/api/v2) | Live job listings |
 
 ## Getting started
 
