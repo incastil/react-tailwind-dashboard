@@ -20,10 +20,12 @@ const stats = [
 ];
 
 const tasks = [
-  'Refine mobile navigation',
-  'Connect candidate search API',
-  'Improve card spacing on tablet',
-  'Add form validation states',
+  'Mobile sidebar drawer with slide animation',
+  'Live candidate data from randomuser.me',
+  'Live job listings from The Muse API',
+  'Dark mode toggle across all surfaces',
+  'Add candidate form with validation',
+  'Reports page with 4 Recharts charts',
 ];
 
 const hiringTrend = [
@@ -315,10 +317,6 @@ function Sidebar({ isOpen, onClose, activePage, onNavigate }) {
           ))}
         </nav>
 
-        <div className="mt-auto rounded-2xl bg-white/5 p-4 text-sm text-slate-300 ring-1 ring-white/10">
-          <p className="font-semibold text-white">Portfolio tip</p>
-          <p className="mt-2 leading-6">Swap the mock data for your own API, add dark mode, and push the project to GitHub.</p>
-        </div>
       </aside>
     </>
   );
@@ -421,9 +419,9 @@ function DashboardPage({ query, setQuery, candidates, loading, error }) {
           <div className="card p-5">
             <h3 className="text-lg font-semibold dark:text-white">What makes it resume-ready</h3>
             <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-400">
-              This project demonstrates responsive design, reusable UI, state management, table
-              filtering, and polished Tailwind styling. It also gives you a clean base to add a
-              real API, charts, dark mode, or CMS content later.
+              This project demonstrates responsive design, reusable component architecture, React state
+              management, live API integration, client-side routing, form validation, data visualization
+              with Recharts, and dark mode — all without a UI framework.
             </p>
           </div>
         </aside>
