@@ -386,7 +386,9 @@ function DashboardPage({ query, setQuery, candidates, loading, error }) {
                     <tr key={c.name} className="border-b border-slate-100 last:border-0 dark:border-slate-700/60">
                       <td className="py-4 pr-4">
                         <div className="flex items-center gap-3">
-                          <img src={c.picture} alt={c.name} className="h-8 w-8 rounded-full object-cover" />
+                          {c.picture
+                            ? <img src={c.picture} alt={c.name} className="h-8 w-8 rounded-full object-cover" />
+                            : <InitialsAvatar name={c.name} />}
                           <span className="font-medium text-slate-900 dark:text-slate-100">{c.name}</span>
                         </div>
                       </td>
@@ -588,6 +590,119 @@ function ReportsPage({ dark }) {
   );
 }
 
+const EMPTY_FORM = { name: '', role: ROLES[0], location: '', status: STATUSES[0] };
+
+function AddCandidateModal({ onClose, onAdd }) {
+  const [form, setForm] = useState(EMPTY_FORM);
+  const [errors, setErrors] = useState({});
+
+  function validate() {
+    const e = {};
+    if (!form.name.trim()) e.name = 'Name is required';
+    if (!form.location.trim()) e.location = 'Location is required';
+    return e;
+  }
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    const e2 = validate();
+    if (Object.keys(e2).length) { setErrors(e2); return; }
+    onAdd({ ...form, picture: null });
+    onClose();
+  }
+
+  function field(label, key, type = 'text') {
+    return (
+      <div>
+        <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">{label}</label>
+        <input
+          type={type}
+          value={form[key]}
+          onChange={(e) => { setForm((f) => ({ ...f, [key]: e.target.value })); setErrors((er) => ({ ...er, [key]: '' })); }}
+          className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none transition placeholder:text-slate-400 focus:border-brand-500 focus:ring-4 focus:ring-brand-100 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder:text-slate-400"
+          placeholder={label}
+        />
+        {errors[key] && <p className="mt-1 text-xs text-rose-500">{errors[key]}</p>}
+      </div>
+    );
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+
+      {/* Panel */}
+      <div className="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-xl dark:bg-slate-800">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold dark:text-white">Add candidate</h2>
+          <button
+            onClick={onClose}
+            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-700"
+            aria-label="Close"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="mt-5 space-y-4">
+          {field('Full name', 'name')}
+          {field('Location', 'location')}
+
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Role</label>
+            <select
+              value={form.role}
+              onChange={(e) => setForm((f) => ({ ...f, role: e.target.value }))}
+              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-700 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-100 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
+            >
+              {ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
+            </select>
+          </div>
+
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Status</label>
+            <select
+              value={form.status}
+              onChange={(e) => setForm((f) => ({ ...f, status: e.target.value }))}
+              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-700 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-100 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
+            >
+              {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+            </select>
+          </div>
+
+          <div className="flex justify-end gap-3 pt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700"
+            >
+              Add candidate
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function InitialsAvatar({ name }) {
+  const initials = name.split(' ').map((n) => n[0]).slice(0, 2).join('').toUpperCase();
+  return (
+    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-100 text-xs font-bold text-brand-700 dark:bg-brand-900/40 dark:text-brand-400">
+      {initials}
+    </div>
+  );
+}
+
 export default function App() {
   const [query, setQuery] = useState('');
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -596,6 +711,7 @@ export default function App() {
   const [candidates, setCandidates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', dark);
@@ -621,6 +737,10 @@ export default function App() {
       .finally(() => setLoading(false));
   }, []);
 
+  function handleAddCandidate(candidate) {
+    setCandidates((prev) => [candidate, ...prev]);
+  }
+
   function renderPage() {
     switch (activePage) {
       case 'Dashboard':
@@ -640,6 +760,9 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-slate-900 md:flex">
+      {modalOpen && (
+        <AddCandidateModal onClose={() => setModalOpen(false)} onAdd={handleAddCandidate} />
+      )}
       <Sidebar
         isOpen={drawerOpen}
         onClose={() => setDrawerOpen(false)}
@@ -691,7 +814,10 @@ export default function App() {
                 </svg>
               )}
             </button>
-            <button className="shrink-0 rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-700 dark:bg-brand-600 dark:hover:bg-brand-700">
+            <button
+              onClick={() => setModalOpen(true)}
+              className="shrink-0 rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-700 dark:bg-brand-600 dark:hover:bg-brand-700"
+            >
               Add candidate
             </button>
           </div>
