@@ -1,13 +1,14 @@
 # Workhint UI — React + Tailwind Dashboard
 
-A responsive candidate tracking dashboard built with React, Vite, and Tailwind CSS. Fetches live data from a public API and includes dark mode, client-side navigation, and a mobile sidebar drawer.
+A responsive candidate tracking dashboard built with React, Vite, and Tailwind CSS. Fetches live data from a public API and includes dark mode, client-side navigation, a mobile sidebar drawer, and a full reports page with charts.
 
 ## Features
 
 - **Client-side navigation** — Dashboard, Candidates, Jobs, Reports, and Settings pages with active state highlighting
 - **Live data** — candidates fetched from [randomuser.me](https://randomuser.me) with avatar thumbnails
 - **Search filtering** — filter by name, role, or location in real time
-- **Dark mode** — class-based toggle, persists across all surfaces
+- **Reports page** — 4 charts built with Recharts: hiring trend (area), candidate pipeline (bar), response rate (line), and time to hire (line)
+- **Dark mode** — class-based toggle, persists across all surfaces and charts
 - **Mobile sidebar drawer** — slides in with backdrop on small screens, always visible on desktop
 - **Status badges** — Active, Interviewing, and Pending with light and dark variants
 - **Loading skeleton** — animated placeholders while data loads
@@ -18,6 +19,7 @@ A responsive candidate tracking dashboard built with React, Vite, and Tailwind C
 - [React 18](https://react.dev)
 - [Vite](https://vitejs.dev)
 - [Tailwind CSS v3](https://tailwindcss.com)
+- [Recharts](https://recharts.org)
 - [randomuser.me API](https://randomuser.me)
 
 ## Getting started
