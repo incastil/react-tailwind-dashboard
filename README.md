@@ -1,13 +1,15 @@
 # React + Tailwind Dashboard Starter
 
-A small responsive dashboard starter you can use on GitHub, customize, and turn into a portfolio piece.
+A responsive dashboard starter built with React and Tailwind CSS — ready to customize and use as a portfolio piece.
 
 ## Features
 - React + Vite
 - Tailwind CSS styling
-- Responsive sidebar layout
-- Search filtering
-- Status badges
+- Dark mode (class-based toggle)
+- Mobile sidebar drawer with backdrop and slide animation
+- Responsive layout — sidebar always visible on desktop
+- Search filtering on candidate table
+- Status badges with dark mode variants
 - Clean component structure for easy edits
 
 ## Run locally
@@ -25,7 +27,6 @@ npm run preview
 ## Easy ways to customize
 - Replace mock data in `src/App.jsx`
 - Add a real API fetch
-- Convert the sidebar into a mobile drawer
-- Add dark mode
-- Add charts or cards for metrics
-- Swap the dashboard content to match your niche
+- Swap dashboard content to match your niche
+- Add charts or metric cards
+- Connect authentication
