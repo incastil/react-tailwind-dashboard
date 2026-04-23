@@ -1,32 +1,34 @@
-# React + Tailwind Dashboard Starter
+# Workhint UI — React + Tailwind Dashboard
 
-A responsive dashboard starter built with React and Tailwind CSS — ready to customize and use as a portfolio piece.
+A responsive candidate tracking dashboard built with React, Vite, and Tailwind CSS. Fetches live data from a public API and includes dark mode and a mobile sidebar drawer.
 
 ## Features
-- React + Vite
-- Tailwind CSS styling
-- Dark mode (class-based toggle)
-- Mobile sidebar drawer with backdrop and slide animation
-- Responsive layout — sidebar always visible on desktop
-- Search filtering on candidate table
-- Status badges with dark mode variants
-- Clean component structure for easy edits
 
-## Run locally
+- **Live data** — candidates fetched from [randomuser.me](https://randomuser.me) with avatar thumbnails
+- **Search filtering** — filter by name, role, or location in real time
+- **Dark mode** — class-based toggle, persists across all surfaces
+- **Mobile sidebar drawer** — slides in with backdrop on small screens, always visible on desktop
+- **Status badges** — Active, Interviewing, and Pending with light and dark variants
+- **Loading skeleton** — animated placeholders while data loads
+- **Responsive layout** — works on mobile, tablet, and desktop
+
+## Tech stack
+
+- [React 18](https://react.dev)
+- [Vite](https://vitejs.dev)
+- [Tailwind CSS v3](https://tailwindcss.com)
+- [randomuser.me API](https://randomuser.me)
+
+## Getting started
+
 ```bash
 npm install
 npm run dev
 ```
 
-## Build for production
+## Production build
+
 ```bash
 npm run build
 npm run preview
 ```
-
-## Easy ways to customize
-- Replace mock data in `src/App.jsx`
-- Add a real API fetch
-- Swap dashboard content to match your niche
-- Add charts or metric cards
-- Connect authentication
