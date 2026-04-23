@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
-  AreaChart, Area, BarChart, Bar,
+  AreaChart, Area, BarChart, Bar, LineChart, Line,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from 'recharts';
 
@@ -26,7 +26,6 @@ const tasks = [
   'Add form validation states',
 ];
 
-// Trend data derived from stat card numbers
 const hiringTrend = [
   { month: 'Nov', jobs: 89,  candidates: 1740 },
   { month: 'Dec', jobs: 97,  candidates: 1950 },
@@ -43,6 +42,24 @@ const pipelineData = [
   { month: 'Feb', Active: 51, Interviewing: 36, Pending: 23 },
   { month: 'Mar', Active: 55, Interviewing: 38, Pending: 21 },
   { month: 'Apr', Active: 61, Interviewing: 42, Pending: 25 },
+];
+
+const responseRateTrend = [
+  { month: 'Nov', rate: 84 },
+  { month: 'Dec', rate: 86 },
+  { month: 'Jan', rate: 87 },
+  { month: 'Feb', rate: 88 },
+  { month: 'Mar', rate: 89 },
+  { month: 'Apr', rate: 91 },
+];
+
+const timeToHireTrend = [
+  { month: 'Nov', days: 21 },
+  { month: 'Dec', days: 19 },
+  { month: 'Jan', days: 18 },
+  { month: 'Feb', days: 17 },
+  { month: 'Mar', days: 17 },
+  { month: 'Apr', days: 14 },
 ];
 
 const NAV_ITEMS = ['Dashboard', 'Candidates', 'Jobs', 'Reports', 'Settings'];
@@ -77,64 +94,19 @@ function ChartTooltip({ active, payload, label }) {
       <p className="mb-1 font-semibold text-slate-700 dark:text-slate-200">{label}</p>
       {payload.map((p) => (
         <p key={p.name} style={{ color: p.color }} className="font-medium">
-          {p.name}: {p.value.toLocaleString()}
+          {p.name}: {p.value.toLocaleString()}{p.name === 'Response rate' ? '%' : p.name === 'Time to hire' ? 'd' : ''}
         </p>
       ))}
     </div>
   );
 }
 
-function ChartsRow({ dark }) {
+function ChartCard({ title, description, children }) {
   return (
-    <div className="mt-6 grid gap-6 xl:grid-cols-2">
-      {/* Area chart — hiring trend */}
-      <div className="card p-5">
-        <h3 className="text-base font-semibold dark:text-white">Hiring trend</h3>
-        <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">Active jobs & new candidates over 6 months</p>
-        <div className="mt-4 h-52">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={hiringTrend} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
-              <defs>
-                <linearGradient id="jobsGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#6366f1" stopOpacity={0.25} />
-                  <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
-                </linearGradient>
-                <linearGradient id="candidatesGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.2} />
-                  <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke={dark ? '#334155' : '#e2e8f0'} />
-              <XAxis dataKey="month" tick={{ fontSize: 11, fill: dark ? '#94a3b8' : '#64748b' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: dark ? '#94a3b8' : '#64748b' }} axisLine={false} tickLine={false} />
-              <Tooltip content={<ChartTooltip />} />
-              <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} />
-              <Area type="monotone" dataKey="jobs" name="Active jobs" stroke="#6366f1" strokeWidth={2} fill="url(#jobsGrad)" dot={false} />
-              <Area type="monotone" dataKey="candidates" name="Candidates" stroke="#10b981" strokeWidth={2} fill="url(#candidatesGrad)" dot={false} />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-
-      {/* Bar chart — candidate pipeline */}
-      <div className="card p-5">
-        <h3 className="text-base font-semibold dark:text-white">Candidate pipeline</h3>
-        <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">Status breakdown over 6 months</p>
-        <div className="mt-4 h-52">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={pipelineData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }} barSize={10}>
-              <CartesianGrid strokeDasharray="3 3" stroke={dark ? '#334155' : '#e2e8f0'} />
-              <XAxis dataKey="month" tick={{ fontSize: 11, fill: dark ? '#94a3b8' : '#64748b' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: dark ? '#94a3b8' : '#64748b' }} axisLine={false} tickLine={false} />
-              <Tooltip content={<ChartTooltip />} />
-              <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} />
-              <Bar dataKey="Active" name="Active" fill="#6366f1" radius={[3, 3, 0, 0]} />
-              <Bar dataKey="Interviewing" name="Interviewing" fill="#f59e0b" radius={[3, 3, 0, 0]} />
-              <Bar dataKey="Pending" name="Pending" fill="#94a3b8" radius={[3, 3, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
+    <div className="card p-5">
+      <h3 className="text-base font-semibold dark:text-white">{title}</h3>
+      <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">{description}</p>
+      <div className="mt-4 h-52">{children}</div>
     </div>
   );
 }
@@ -204,24 +176,7 @@ function Sidebar({ isOpen, onClose, activePage, onNavigate }) {
   );
 }
 
-function CandidateTable({ candidates, loading, error }) {
-  const [query, setQuery] = useState('');
-
-  const filtered = useMemo(() => {
-    const term = query.trim().toLowerCase();
-    if (!term) return candidates;
-    return candidates.filter(
-      (c) =>
-        c.name.toLowerCase().includes(term) ||
-        c.role.toLowerCase().includes(term) ||
-        c.location.toLowerCase().includes(term),
-    );
-  }, [query, candidates]);
-
-  return { filtered, query, setQuery };
-}
-
-function DashboardPage({ query, setQuery, candidates, loading, error, dark }) {
+function DashboardPage({ query, setQuery, candidates, loading, error }) {
   const filteredCandidates = useMemo(() => {
     const term = query.trim().toLowerCase();
     if (!term) return candidates;
@@ -238,8 +193,6 @@ function DashboardPage({ query, setQuery, candidates, loading, error, dark }) {
       <section className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {stats.map((stat) => <StatCard key={stat.label} {...stat} />)}
       </section>
-
-      <ChartsRow dark={dark} />
 
       <section className="mt-6 grid gap-6 xl:grid-cols-[1.4fr_0.9fr]">
         <div className="card p-5">
@@ -407,6 +360,86 @@ function CandidatesPage({ candidates, loading, error }) {
   );
 }
 
+function ReportsPage({ dark }) {
+  const gridColor = dark ? '#334155' : '#e2e8f0';
+  const tickColor = dark ? '#94a3b8' : '#64748b';
+
+  return (
+    <div className="mt-6 space-y-6">
+      {/* Row 1 */}
+      <div className="grid gap-6 xl:grid-cols-2">
+        <ChartCard title="Hiring trend" description="Active jobs & new candidates over 6 months">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={hiringTrend} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+              <defs>
+                <linearGradient id="jobsGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#6366f1" stopOpacity={0.25} />
+                  <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="candidatesGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.2} />
+                  <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+              <XAxis dataKey="month" tick={{ fontSize: 11, fill: tickColor }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: tickColor }} axisLine={false} tickLine={false} />
+              <Tooltip content={<ChartTooltip />} />
+              <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} />
+              <Area type="monotone" dataKey="jobs" name="Active jobs" stroke="#6366f1" strokeWidth={2} fill="url(#jobsGrad)" dot={false} />
+              <Area type="monotone" dataKey="candidates" name="Candidates" stroke="#10b981" strokeWidth={2} fill="url(#candidatesGrad)" dot={false} />
+            </AreaChart>
+          </ResponsiveContainer>
+        </ChartCard>
+
+        <ChartCard title="Candidate pipeline" description="Status breakdown over 6 months">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={pipelineData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }} barSize={10}>
+              <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+              <XAxis dataKey="month" tick={{ fontSize: 11, fill: tickColor }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: tickColor }} axisLine={false} tickLine={false} />
+              <Tooltip content={<ChartTooltip />} />
+              <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} />
+              <Bar dataKey="Active" name="Active" fill="#6366f1" radius={[3, 3, 0, 0]} />
+              <Bar dataKey="Interviewing" name="Interviewing" fill="#f59e0b" radius={[3, 3, 0, 0]} />
+              <Bar dataKey="Pending" name="Pending" fill="#94a3b8" radius={[3, 3, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartCard>
+      </div>
+
+      {/* Row 2 */}
+      <div className="grid gap-6 xl:grid-cols-2">
+        <ChartCard title="Response rate" description="Candidate response rate trending toward 91%">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={responseRateTrend} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+              <XAxis dataKey="month" tick={{ fontSize: 11, fill: tickColor }} axisLine={false} tickLine={false} />
+              <YAxis domain={[80, 95]} tick={{ fontSize: 11, fill: tickColor }} axisLine={false} tickLine={false} />
+              <Tooltip content={<ChartTooltip />} />
+              <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} />
+              <Line type="monotone" dataKey="rate" name="Response rate" stroke="#10b981" strokeWidth={2} dot={{ r: 3, fill: '#10b981' }} />
+            </LineChart>
+          </ResponsiveContainer>
+        </ChartCard>
+
+        <ChartCard title="Time to hire" description="Average days to hire dropping toward 14 days">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={timeToHireTrend} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+              <XAxis dataKey="month" tick={{ fontSize: 11, fill: tickColor }} axisLine={false} tickLine={false} />
+              <YAxis domain={[10, 25]} tick={{ fontSize: 11, fill: tickColor }} axisLine={false} tickLine={false} />
+              <Tooltip content={<ChartTooltip />} />
+              <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} />
+              <Line type="monotone" dataKey="days" name="Time to hire" stroke="#f59e0b" strokeWidth={2} dot={{ r: 3, fill: '#f59e0b' }} />
+            </LineChart>
+          </ResponsiveContainer>
+        </ChartCard>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   const [query, setQuery] = useState('');
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -443,13 +476,13 @@ export default function App() {
   function renderPage() {
     switch (activePage) {
       case 'Dashboard':
-        return <DashboardPage query={query} setQuery={setQuery} candidates={candidates} loading={loading} error={error} dark={dark} />;
+        return <DashboardPage query={query} setQuery={setQuery} candidates={candidates} loading={loading} error={error} />;
       case 'Candidates':
         return <CandidatesPage candidates={candidates} loading={loading} error={error} />;
       case 'Jobs':
         return <PlaceholderPage title="Jobs" description="Post and manage open roles. Coming soon." />;
       case 'Reports':
-        return <PlaceholderPage title="Reports" description="Analytics and hiring metrics. Coming soon." />;
+        return <ReportsPage dark={dark} />;
       case 'Settings':
         return <PlaceholderPage title="Settings" description="Account and workspace preferences. Coming soon." />;
       default:
