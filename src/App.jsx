@@ -1,14 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import {
+  AreaChart, Area, BarChart, Bar,
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
+} from 'recharts';
 
 const ROLES = [
-  'Frontend Developer',
-  'UI Engineer',
-  'Product Designer',
-  'Full-Stack Developer',
-  'Backend Engineer',
-  'DevOps Engineer',
-  'Mobile Developer',
-  'QA Engineer',
+  'Frontend Developer', 'UI Engineer', 'Product Designer',
+  'Full-Stack Developer', 'Backend Engineer', 'DevOps Engineer',
+  'Mobile Developer', 'QA Engineer',
 ];
 
 const STATUSES = ['Active', 'Interviewing', 'Pending'];
@@ -25,6 +24,25 @@ const tasks = [
   'Connect candidate search API',
   'Improve card spacing on tablet',
   'Add form validation states',
+];
+
+// Trend data derived from stat card numbers
+const hiringTrend = [
+  { month: 'Nov', jobs: 89,  candidates: 1740 },
+  { month: 'Dec', jobs: 97,  candidates: 1950 },
+  { month: 'Jan', jobs: 103, candidates: 2080 },
+  { month: 'Feb', jobs: 110, candidates: 2210 },
+  { month: 'Mar', jobs: 114, candidates: 2241 },
+  { month: 'Apr', jobs: 128, candidates: 2430 },
+];
+
+const pipelineData = [
+  { month: 'Nov', Active: 38, Interviewing: 29, Pending: 22 },
+  { month: 'Dec', Active: 42, Interviewing: 31, Pending: 24 },
+  { month: 'Jan', Active: 47, Interviewing: 34, Pending: 22 },
+  { month: 'Feb', Active: 51, Interviewing: 36, Pending: 23 },
+  { month: 'Mar', Active: 55, Interviewing: 38, Pending: 21 },
+  { month: 'Apr', Active: 61, Interviewing: 42, Pending: 25 },
 ];
 
 const NAV_ITEMS = ['Dashboard', 'Candidates', 'Jobs', 'Reports', 'Settings'];
@@ -52,14 +70,81 @@ function StatCard({ label, value, change }) {
   );
 }
 
+function ChartTooltip({ active, payload, label }) {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-soft text-xs dark:border-slate-700 dark:bg-slate-800">
+      <p className="mb-1 font-semibold text-slate-700 dark:text-slate-200">{label}</p>
+      {payload.map((p) => (
+        <p key={p.name} style={{ color: p.color }} className="font-medium">
+          {p.name}: {p.value.toLocaleString()}
+        </p>
+      ))}
+    </div>
+  );
+}
+
+function ChartsRow({ dark }) {
+  return (
+    <div className="mt-6 grid gap-6 xl:grid-cols-2">
+      {/* Area chart — hiring trend */}
+      <div className="card p-5">
+        <h3 className="text-base font-semibold dark:text-white">Hiring trend</h3>
+        <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">Active jobs & new candidates over 6 months</p>
+        <div className="mt-4 h-52">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={hiringTrend} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+              <defs>
+                <linearGradient id="jobsGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#6366f1" stopOpacity={0.25} />
+                  <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="candidatesGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.2} />
+                  <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke={dark ? '#334155' : '#e2e8f0'} />
+              <XAxis dataKey="month" tick={{ fontSize: 11, fill: dark ? '#94a3b8' : '#64748b' }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: dark ? '#94a3b8' : '#64748b' }} axisLine={false} tickLine={false} />
+              <Tooltip content={<ChartTooltip />} />
+              <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} />
+              <Area type="monotone" dataKey="jobs" name="Active jobs" stroke="#6366f1" strokeWidth={2} fill="url(#jobsGrad)" dot={false} />
+              <Area type="monotone" dataKey="candidates" name="Candidates" stroke="#10b981" strokeWidth={2} fill="url(#candidatesGrad)" dot={false} />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Bar chart — candidate pipeline */}
+      <div className="card p-5">
+        <h3 className="text-base font-semibold dark:text-white">Candidate pipeline</h3>
+        <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">Status breakdown over 6 months</p>
+        <div className="mt-4 h-52">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={pipelineData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }} barSize={10}>
+              <CartesianGrid strokeDasharray="3 3" stroke={dark ? '#334155' : '#e2e8f0'} />
+              <XAxis dataKey="month" tick={{ fontSize: 11, fill: dark ? '#94a3b8' : '#64748b' }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: dark ? '#94a3b8' : '#64748b' }} axisLine={false} tickLine={false} />
+              <Tooltip content={<ChartTooltip />} />
+              <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} />
+              <Bar dataKey="Active" name="Active" fill="#6366f1" radius={[3, 3, 0, 0]} />
+              <Bar dataKey="Interviewing" name="Interviewing" fill="#f59e0b" radius={[3, 3, 0, 0]} />
+              <Bar dataKey="Pending" name="Pending" fill="#94a3b8" radius={[3, 3, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function PlaceholderPage({ title, description }) {
   return (
     <div className="flex flex-1 items-center justify-center py-32">
       <div className="text-center">
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-100 dark:bg-brand-900/40">
-          <span className="text-2xl font-bold text-brand-600 dark:text-brand-400">
-            {title[0]}
-          </span>
+          <span className="text-2xl font-bold text-brand-600 dark:text-brand-400">{title[0]}</span>
         </div>
         <h2 className="mt-4 text-2xl font-semibold text-slate-900 dark:text-white">{title}</h2>
         <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">{description}</p>
@@ -90,9 +175,7 @@ function Sidebar({ isOpen, onClose, activePage, onNavigate }) {
         </button>
 
         <div>
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-600 font-bold shadow-lg shadow-brand-600/30">
-            W
-          </div>
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-600 font-bold shadow-lg shadow-brand-600/30">W</div>
           <h1 className="mt-4 text-xl font-semibold">Workhint UI</h1>
           <p className="mt-1 text-sm text-slate-400">React + Tailwind dashboard starter</p>
         </div>
@@ -105,8 +188,7 @@ function Sidebar({ isOpen, onClose, activePage, onNavigate }) {
               className={`flex w-full items-center rounded-xl px-4 py-3 text-left transition
                 ${activePage === item
                   ? 'bg-white/10 font-semibold text-white'
-                  : 'text-slate-300 hover:bg-white/5 hover:text-white'
-                }`}
+                  : 'text-slate-300 hover:bg-white/5 hover:text-white'}`}
             >
               {item}
             </button>
@@ -115,16 +197,31 @@ function Sidebar({ isOpen, onClose, activePage, onNavigate }) {
 
         <div className="mt-auto rounded-2xl bg-white/5 p-4 text-sm text-slate-300 ring-1 ring-white/10">
           <p className="font-semibold text-white">Portfolio tip</p>
-          <p className="mt-2 leading-6">
-            Swap the mock data for your own API, add dark mode, and push the project to GitHub.
-          </p>
+          <p className="mt-2 leading-6">Swap the mock data for your own API, add dark mode, and push the project to GitHub.</p>
         </div>
       </aside>
     </>
   );
 }
 
-function DashboardPage({ query, setQuery, candidates, loading, error }) {
+function CandidateTable({ candidates, loading, error }) {
+  const [query, setQuery] = useState('');
+
+  const filtered = useMemo(() => {
+    const term = query.trim().toLowerCase();
+    if (!term) return candidates;
+    return candidates.filter(
+      (c) =>
+        c.name.toLowerCase().includes(term) ||
+        c.role.toLowerCase().includes(term) ||
+        c.location.toLowerCase().includes(term),
+    );
+  }, [query, candidates]);
+
+  return { filtered, query, setQuery };
+}
+
+function DashboardPage({ query, setQuery, candidates, loading, error, dark }) {
   const filteredCandidates = useMemo(() => {
     const term = query.trim().toLowerCase();
     if (!term) return candidates;
@@ -139,10 +236,10 @@ function DashboardPage({ query, setQuery, candidates, loading, error }) {
   return (
     <>
       <section className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {stats.map((stat) => (
-          <StatCard key={stat.label} {...stat} />
-        ))}
+        {stats.map((stat) => <StatCard key={stat.label} {...stat} />)}
       </section>
+
+      <ChartsRow dark={dark} />
 
       <section className="mt-6 grid gap-6 xl:grid-cols-[1.4fr_0.9fr]">
         <div className="card p-5">
@@ -194,9 +291,7 @@ function DashboardPage({ query, setQuery, candidates, loading, error }) {
                       </td>
                       <td className="py-4 pr-4 text-slate-600 dark:text-slate-400">{c.role}</td>
                       <td className="py-4 pr-4 text-slate-600 dark:text-slate-400">{c.location}</td>
-                      <td className="py-4 pr-4">
-                        <StatusBadge status={c.status} />
-                      </td>
+                      <td className="py-4 pr-4"><StatusBadge status={c.status} /></td>
                     </tr>
                   ))}
                 </tbody>
@@ -301,9 +396,7 @@ function CandidatesPage({ candidates, loading, error }) {
                   </td>
                   <td className="py-4 pr-4 text-slate-600 dark:text-slate-400">{c.role}</td>
                   <td className="py-4 pr-4 text-slate-600 dark:text-slate-400">{c.location}</td>
-                  <td className="py-4 pr-4">
-                    <StatusBadge status={c.status} />
-                  </td>
+                  <td className="py-4 pr-4"><StatusBadge status={c.status} /></td>
                 </tr>
               ))}
             </tbody>
@@ -350,7 +443,7 @@ export default function App() {
   function renderPage() {
     switch (activePage) {
       case 'Dashboard':
-        return <DashboardPage query={query} setQuery={setQuery} candidates={candidates} loading={loading} error={error} />;
+        return <DashboardPage query={query} setQuery={setQuery} candidates={candidates} loading={loading} error={error} dark={dark} />;
       case 'Candidates':
         return <CandidatesPage candidates={candidates} loading={loading} error={error} />;
       case 'Jobs':
@@ -402,7 +495,6 @@ export default function App() {
                 placeholder="Search candidates..."
               />
             )}
-
             <button
               onClick={() => setDark(!dark)}
               className="shrink-0 rounded-xl border border-slate-200 bg-white p-3 text-slate-500 transition hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600"
@@ -418,7 +510,6 @@ export default function App() {
                 </svg>
               )}
             </button>
-
             <button className="shrink-0 rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-700 dark:bg-brand-600 dark:hover:bg-brand-700">
               Add candidate
             </button>
