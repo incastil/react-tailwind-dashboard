@@ -125,6 +125,154 @@ function PlaceholderPage({ title, description }) {
   );
 }
 
+const LEVEL_LABELS = {
+  internship: 'Internship',
+  entry: 'Entry Level',
+  mid: 'Mid Level',
+  senior: 'Senior Level',
+  management: 'Management',
+};
+
+const LEVEL_STYLES = {
+  internship: 'bg-purple-50 text-purple-700 ring-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:ring-purple-700/50',
+  entry: 'bg-sky-50 text-sky-700 ring-sky-200 dark:bg-sky-900/30 dark:text-sky-400 dark:ring-sky-700/50',
+  mid: 'bg-brand-50 text-brand-700 ring-brand-200 dark:bg-brand-900/30 dark:text-brand-400 dark:ring-brand-700/50',
+  senior: 'bg-amber-50 text-amber-700 ring-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:ring-amber-700/50',
+  management: 'bg-rose-50 text-rose-700 ring-rose-200 dark:bg-rose-900/30 dark:text-rose-400 dark:ring-rose-700/50',
+};
+
+function LevelBadge({ level }) {
+  const key = level?.short_name ?? 'mid';
+  return (
+    <span className={`chip ring-1 ${LEVEL_STYLES[key] ?? LEVEL_STYLES.mid}`}>
+      {LEVEL_LABELS[key] ?? level?.name ?? 'Unknown'}
+    </span>
+  );
+}
+
+function JobsPage() {
+  const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [query, setQuery] = useState('');
+  const [levelFilter, setLevelFilter] = useState('all');
+
+  useEffect(() => {
+    fetch('https://www.themuse.com/api/public/jobs?page=1&category=Software%20Engineering&descending=true')
+      .then((res) => {
+        if (!res.ok) throw new Error('Failed to fetch jobs');
+        return res.json();
+      })
+      .then((data) => setJobs(data.results))
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const levels = useMemo(() => {
+    const seen = new Set();
+    jobs.forEach((j) => j.levels.forEach((l) => seen.add(l.short_name)));
+    return [...seen];
+  }, [jobs]);
+
+  const filtered = useMemo(() => {
+    const term = query.trim().toLowerCase();
+    return jobs.filter((j) => {
+      const matchesQuery =
+        !term ||
+        j.name.toLowerCase().includes(term) ||
+        j.company.name.toLowerCase().includes(term) ||
+        j.locations.some((l) => l.name.toLowerCase().includes(term));
+      const matchesLevel =
+        levelFilter === 'all' || j.levels.some((l) => l.short_name === levelFilter);
+      return matchesQuery && matchesLevel;
+    });
+  }, [jobs, query, levelFilter]);
+
+  return (
+    <div className="mt-6 card p-5">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h3 className="text-lg font-semibold dark:text-white">Software Engineering Jobs</h3>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+            {loading ? 'Loading…' : `${filtered.length} listings from The Muse`}
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none transition placeholder:text-slate-400 focus:border-brand-500 focus:ring-4 focus:ring-brand-100 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder:text-slate-400 sm:w-56"
+            placeholder="Search jobs..."
+          />
+          <select
+            value={levelFilter}
+            onChange={(e) => setLevelFilter(e.target.value)}
+            className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-100 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
+          >
+            <option value="all">All levels</option>
+            {levels.map((l) => (
+              <option key={l} value={l}>{LEVEL_LABELS[l] ?? l}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <div className="mt-5 overflow-x-auto">
+        {error ? (
+          <p className="py-8 text-center text-sm text-rose-500">{error}</p>
+        ) : loading ? (
+          <div className="space-y-3 py-4">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-4">
+                <div className="flex-1 space-y-2">
+                  <div className="h-3 w-1/2 animate-pulse rounded bg-slate-200 dark:bg-slate-700" />
+                  <div className="h-3 w-1/3 animate-pulse rounded bg-slate-200 dark:bg-slate-700" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <table className="min-w-full text-left text-sm">
+            <thead className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">
+              <tr className="border-b border-slate-200 dark:border-slate-700">
+                <th className="py-3 pr-4 font-semibold">Job title</th>
+                <th className="py-3 pr-4 font-semibold">Company</th>
+                <th className="py-3 pr-4 font-semibold">Location</th>
+                <th className="py-3 pr-4 font-semibold">Level</th>
+                <th className="py-3 pr-4 font-semibold">Link</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((job) => (
+                <tr key={job.id} className="border-b border-slate-100 last:border-0 dark:border-slate-700/60">
+                  <td className="py-4 pr-4 font-medium text-slate-900 dark:text-slate-100">{job.name}</td>
+                  <td className="py-4 pr-4 text-slate-600 dark:text-slate-400">{job.company.name}</td>
+                  <td className="py-4 pr-4 text-slate-600 dark:text-slate-400">
+                    {job.locations.map((l) => l.name).join(', ') || 'Remote'}
+                  </td>
+                  <td className="py-4 pr-4">
+                    {job.levels[0] ? <LevelBadge level={job.levels[0]} /> : '—'}
+                  </td>
+                  <td className="py-4 pr-4">
+                    <a
+                      href={job.refs.landing_page}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-brand-600 hover:underline dark:text-brand-400"
+                    >
+                      View →
+                    </a>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function Sidebar({ isOpen, onClose, activePage, onNavigate }) {
   return (
     <>
@@ -480,7 +628,7 @@ export default function App() {
       case 'Candidates':
         return <CandidatesPage candidates={candidates} loading={loading} error={error} />;
       case 'Jobs':
-        return <PlaceholderPage title="Jobs" description="Post and manage open roles. Coming soon." />;
+        return <JobsPage />;
       case 'Reports':
         return <ReportsPage dark={dark} />;
       case 'Settings':
